@@ -1,0 +1,40 @@
+freestyle job deployment
+
+1. Code from git hub - Build and Test using Jenkins - deployment in tomcat server
+
+Code section -
+step 1 - source code can be get or keep from Git hub.
+step 2- Start Ec2 instance and install Jenkins in ec2 instance and start Jenkins
+step 3- install git in ec2 instance to get code from git hub to Jenkins(CI)
+step 4 - IN Jenkins create new job as freestyle and configure it 
+step 5 - configurations for Jenkins - select git hub url - copy and paste GitHub repo url(2 places) in Jenkins and save it
+
+Build + Test section :
+
+step 6- install maven and before we need to install maven dependency - java 
+       
+command - yum install java-1.8.0-openjdk -y
+
+Note : when installing Jenkins we used java 11 version dependency.
+
+to check and change java versions use this command as ---> update-alternatives --config java
+
+By using above command we can select which java that we want
+
+step 7 - install maven by using command - yum install maven -y
+
+after installing check java version it should be java 1.8.0 and use command as mvn -v to checkstep 
+
+Step 8 - Go to job in jenkins in section called build steps select invoke "maven plugin" and perform all maven steps using - "clean package" command and build it and check in server that we can see target file in that. (it contains jar/war file produced by maven.
+
+step 9 - create new instance and install tomcat server in that by using link
+
+when ever we need to download file from internet we need to use command called "wget link address" and need to unzip this by using command - 
+
+ download file from internet - wget https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.91/bin/apache-tomcat-9.0.91.tar.gz 
+
+unzipping - "tar -zxvf filename" (apache-tomcat-9.0.91.tar.gz)
+
+
+
+

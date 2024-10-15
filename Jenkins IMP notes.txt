@@ -1,0 +1,21 @@
+Jenkins
+
+
+1. Diff between PSCM and webhook and build periodically
+
+PollSCM - it will be used when dev commit the changes in specific timing(using corn syntax) only and it works only for git 
+
+webhook - anytime when dev commit the changes in git and it will trigger build
+
+Build periodically - it works for any tool and we can set the build time and dates by using corn syntax. according to time it will trigger the build.
+
+
+2. options of parameters by using this we can automate pipeline little bit easier.
+
+1. Boolean parameter - true or false
+2. Choice parameter - Multiple options - we need to give variable at build section and mention their values/options in choice parameter section.
+3. File - - this can be used when we build local file from their machine
+4. STRING parameter - INPUT (in single line) - while pipeline running  if we want to pass any input we can use this in single line.
+5. MULTI String parameter - MULTI-INPUT (in multi lines) - while pipeline running  if we want to pass any input we can use this in multiple lines.
+
+

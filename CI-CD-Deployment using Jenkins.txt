@@ -1,0 +1,89 @@
+Deployment using Jenkins:
+
+1. the term deployments refers to installation of webapplication in webserver 
+
+why deployments
+
+--> to release new features
+--> bug fixes
+--> releasing new version of application
+--> Breaking large application to micro-services
+
+Need for deployment:
+
+1. we need to have infra setup
+2. all teams must be available during deployment
+3. databases if needed
+4. seeking approval from Release manager approval
+5. latest code
+
+precautions: 
+
+1. Need to take backups for previous build info
+2. Need to provide isolated environments for dev, QA and prod
+3. can be able to roll back to previous version if current version release fails
+4. make sure to deploy the application in correct environment and client application
+
+Step-1:
+Launch 4 instances with same pem file
+1. Jenkins: T2 micro
+2. Tomcat: T2.micro
+3. Sonar: T2.medium(20 GB of EBS volume) - setup sonar and launch. Generate one token.
+4. Nexus: T2.medium(20 GB of EBS volume) - setup nexus and launch
+
+--------------Interview question--------------
+Difference between wget and curl
+wget: It is used to download only files from the internet.
+curl: It is use to check for network connection also
+----------------------------------------------
+
+Step-2:
+Login into jenkins dashboard and install these following plugins
+1. Sonarqube scanner: To scan the code
+2. Nexus artifactory uploader: To store the files in nexus
+3. SSH Agent: To send the files from one server to another server.
+
+Step-3:
+Create a jenkins piepline job and write a jenkins file to deploy a webapp. Usually we have 2 types of pipelines:
+1.scripted
+2.declarative
+
+Scripted pipeline:
+Stage1: Get the code from the github to CI server
+node{
+stage("code"){
+git "github-url"
+}
+}
+-------------------------------------------
+node{
+    stage("Code")
+    {
+        git "https://github.com/Charan-19/WebApp.git"
+    }
+    stage("Build"){
+//Integrate maven tool in tool config. Provide name(maven) of the tool which should be used in below script
+        def mavenHome = tool name: "maven", type: "maven"
+        def mavenCMD= "${mavenHome}/bin/mvn"
+        sh "${mavenCMD} clean package"
+    }
+    stage("Test"){
+//Provide name of the tool provided when integrating sonar qube in jenkins system config.
+        withSonarQubeEnv("mysonar"){
+            def mavenHome = tool name: "maven", type: "maven"
+            def mavenCMD= "${mavenHome}/bin/mvn"
+            sh "${mavenCMD} sonar:sonar"
+        }
+    }
+    stage("Artifactory-uploader"){// this you can generate using pipeline script
+        nexusArtifactUploader artifacts: [[artifactId: 'myweb', classifier: '', file: 'target/myweb-8.2.8.war', type: '.war']], credentialsId: '74034e16-317f-4ed4-971e-7f7e31b89e14', groupId: 'in.javahome', nexusUrl: '54.175.246.136:8081', nexusVersion: 'nexus3', protocol: 'http', repository: 'charan-releases', version: '8.2.8'
+    }
+//Install apache tomcat in opt folder and change owners to ec2
+    stage("Deploy"){// this you can generate using pipeline script
+        sshagent(['9fd41c22-cfdf-4a50-9b91-e4e5c77325a3']) {
+            sh "scp -o StrictHostKeyChecking=no target/myweb-8.2.8.war ec2-user@52.90.92.0:/opt/apache-tomcat-9.0.86/webapps/swiggy"
+        }
+    }
+}
+
+6d78e4a40dda687bd15e243835342fc11c5a8939
