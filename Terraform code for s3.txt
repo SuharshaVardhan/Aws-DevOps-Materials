@@ -1,0 +1,57 @@
+Here is an example of Terraform code to create an S3 bucket and attach a policy:
+
+```hcl
+provider "aws" {
+  region = "us-west-2"
+}
+
+resource "aws_s3_bucket" "my_bucket" {
+  bucket = "my-unique-bucket-name"
+  acl    = "private"
+}
+
+data "aws_iam_policy_document" "bucket_policy" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+    ]
+    resources = [
+      aws_s3_bucket.my_bucket.arn,
+      "${aws_s3_bucket.my_bucket.arn}/*",
+    ]
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity XXXXX"]
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "bucket_policy" {
+  bucket = aws_s3_bucket.my_bucket.id
+  policy = data.aws_iam_policy_document.bucket_policy.json
+}
+```
+
+Here's a breakdown of the code:
+
+## Provider Configuration
+- The `provider` block specifies the AWS region to use.
+
+## S3 Bucket Resource
+- The `aws_s3_bucket` resource creates an S3 bucket with the specified name.
+- The `acl` attribute sets the access control list (ACL) of the bucket to "private".
+
+## IAM Policy Document
+- The `data` block defines an IAM policy document using the `aws_iam_policy_document` data source.
+- The policy grants the `s3:GetObject` permission to the specified resources (the bucket ARN and all objects within the bucket).
+- The `principals` block specifies the AWS principal (CloudFront Origin Access Identity) that is allowed to access the bucket.
+
+## S3 Bucket Policy Resource
+- The `aws_s3_bucket_policy` resource attaches the IAM policy document to the S3 bucket.
+- The `bucket` attribute specifies the ID of the S3 bucket to which the policy will be attached.
+- The `policy` attribute sets the policy document as a JSON string.
+
+To use this Terraform code, you need to replace `"my-unique-bucket-name"` with a unique name for your S3 bucket and provide the appropriate CloudFront Origin Access Identity ARN.
+
+After running `terraform init` to initialize the Terraform working directory and `terraform apply` to create the resources, the S3 bucket will be created with the specified policy attached.

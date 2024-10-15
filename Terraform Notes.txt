@@ -1,0 +1,170 @@
+Terraform :
+
+it is developed by hashicrop company - developed person - Mitchellhashimoto
+It is developed using Go language 
+in terraform all configuration files will be in HashiCrop Configuration language(HCL)
+It will simple syntax formulae - can be used for creating infrastructure across multiple clouds and on premises
+terraform can handle low level elements like networking storage and compute instances and high level elements like Saas features and DNS entries
+it is famous for easy to use but not true for complex environments it is not easy
+
+Its main purpose is eliminating the manual intervention of provisioning and management
+
+
+advantages -
+readable code
+Dry run - mean without running the code we can find errors
+Import of resources is easy
+Can create multiple resources easy
+Can create templates for repeatable code
+
+disadvantages
+
+bugs
+few items cannot be imported
+its always in under development state
+
+
+
+Terraform commands -
+
+terraform init
+terraform plan
+terraform apply
+terraform destroy
+terraform fmt - it will format the code neatly
+terraform apply --auto-approve - to apply changes automatically without condition
+
+Terraform workspace commands :
+
+Subcommands:
+    delete    it will Delete a workspace - terraform workspace delete filename
+    list      it will show List of Workspaces - terraform workspace list
+    new       it will Create and also switch to a new workspace - terraform workspace new filename
+    select    Select a workspace in list of workspaces - terraform workspace select filename
+    show      it will Show the name of the current workspace - terraform workspace show
+
+
+Terraform Syntax
+
+1. Provider section - includes region, access key and secret key. (that we created from aws account using IAM service)
+
+2. resource section - includes instance key, ami id, tags - instance name and environment, instance type, security group.
+
+3. Variables - its a value we can define once, declare and use whereever we want. it contains 3 sections - description, type and default
+
+ex : ami = var.myami --> this we can define in resource block
+
+create separate block for each variable 
+
+variable "myami" {
+type = string
+default = "ami-1234456567a"
+}
+
+Data Types in Terraform: — Terraform supports various data types, such as maps, lists, sets, and objects, allowing us to handle complex data structures within our configurations. Let’s explore some of these data types and demonstrate their usage.
+
+Maps : this can used to find a server/instance with different names by using tags in aws console. we can give names by using multiples types/tags
+
+example :
+in resource block 
+
+tags = var.abc
+
+In variable section
+
+variable "abc" {
+type = map(string)
+default = {
+Name = "my-server"
+environment = "Zomato"
+project = "cranberry"
+}
+}
+
+
+List : a list is a data structure that allows you to store and manage a collection of values. Lists are often used to define input variables, output values, and resource configurations.
+
+example :
+
+provider "aws" {
+region = "ap-south-1"
+}
+
+resource "aws_iam_user" "clark" {
+    count = length(var.abc)
+    name = var.abc[count.index]
+}
+
+variable "abc" {
+    type = list (string)
+    default = ["hai", "siri", "alexa"]
+} 
+
+set : a set is a data structure that allows you to store and manage a collection of unique values.(it removes common repeated values). set are often used to define input variables, output values, and resource configurations.
+
+example :
+
+provider "aws" {
+region = "ap-south-1"
+}
+
+resource "aws_iam_user" "clark" {
+
+#we used for_each because we need to print or create each thing 
+#first create one variable as var.abc and whenever we take for_each we need to use "name = each.value" to create each value separately
+
+for_each = var.abc
+name = each.value
+}
+
+#by using set function below we can create unique users and user those are repeated it will automatically removed.
+
+variable "abc" {
+    type = set (string)
+    default = ["dev", "prod", "test", "prod"]
+} 
+
+
+By using terraform we can s3 bucket 
+
+provider "aws" {
+region = "ap-south-1"
+access_key = "12243"
+secret_key = "12131afe"
+}
+
+resource "aws_s3_bucket" "one" {
+bucket = "harshavadrdhan"
+acl = "bucket"
+}
+
+resource "aws_s3_bucket_versioning" "two" {
+bucket = aws_s3_bucket.one.id
+versioning_configuration {
+status = "Enabled"
+}
+}
+
+resource "aws_s3_bucket_ownership_controls" "four" {
+bucket = aws_s3_bucket.one.id
+rule {
+object_ownership = "BucketOwnershipPreferred"
+}
+}
+
+resource "aws_s3_bucket_acl" "three" {
+
+depends_on = [aws_s3_bucket_ownership_controls.four.id]
+
+bucket = aws_s3_bucket.one.id
+acl = "Enabled"
+}
+
+
+
+
+
+
+
+
+
