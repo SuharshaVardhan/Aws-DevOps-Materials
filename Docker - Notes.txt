@@ -1,0 +1,621 @@
+Docker :
+
+Virtual machine : it is machine created inside one machine by using resources of that machine
+
+Containerization - its a bundle/package of application and its dependenices and also system dependenices to run application
+ ------> They share HOST OS dependencies to create image thats why they are light weight and also we can install multiple containers on top of HOST OS
+
+---> each container has unique minimal OS for creating logical isolation between one container to another container and they also use HOST OS kernel(base image) also
+
+Docker def ---> Containerization is a technology and docker implements containerization or its a platform are designed to create, run and deploy application
+
+--> we can install docker in any OS
+
+--> its written with GO languague
+
+--> docker lifecycle -
+1. we write docker file to create a docker image by using docker build command
+2. From docker image we can create container by using docker run command
+
+Monolitic architecture -
+
+---> It means all services in application will use single server and single database
+
+Micro-service architecture -
+
+--> it means in application each service has separate server and separate database why we use this means when we want to upgrade one service our application it should get little bit downtime in monolithic all services must experience some downtime but in microservice we only use that service server to upgrade all other services will work fine.
+
+virtualization - Its used to create multiple virtual machines in one machine here all virtual machines shares same HOST OS 
+
+---> Hypervisor is used to create virtualization
+
+Docker architecture 
+
+Docker client - we will interact with docker - here we will perform commands - run, build, pull
+
+Docker Host - contains Docker daemon, containers, images, networks, volumes
+
+Host - its a machine where you install docker engine
+
+daemon - it runs on host operating system and it is responsible for running containers to manage docker services. it communicates with other daemons and manage services like networks, volumes, images, containers, storage
+
+Docker registry - it is used to store or share docker images
+
+Points must be followed :
+
+1. we need to start/restart docker first to use docker
+2. we must use base image to create container
+3. you cant enter to container unless you start container
+4. if you run image by default one container will create
+
+docker default path - /var/lib/docker/
+
+Jenkins default path - /var/lib/Jenkins/
+
+commands -
+
+to install docker 
+
+--> yum install docker -y
+
+to start docker
+
+--> systemctl start/restart docker
+
+to see list of images 
+
+--> docker images
+
+to delete docker images 
+
+--> docker rmi image name
+
+to create docker container 
+
+--> docker run imagename
+
+To Create docker container and with imagename
+
+--> docker run -it --name container-1 ubuntu 
+
+here -it means interactive terminal - which is used to excute commands
+
+To Create docker container and with name and port 8080 (port no is used to access the application that present inside container) we need to give portnum along with public ip address and here -d is detach from container when you use this commands it will create container but you cannot inside and also you can perform actions without gng inside container  for this we need use one commands
+
+
+--> docker run -it -d --name container1 -p 8081:80 imagename
+
+--> docker exec containername ls
+
+
+To check all docker containers
+
+--> docker ps -a or docker container ls -a
+
+To check only running containers
+
+-->  docker ps or docker container ls
+
+to start docker container
+
+--> docker start container name/container id
+
+to go inside docker container
+
+--> docker attach container name/id
+
+to stop single docker container
+
+--> docker stop container name/container id
+
+to delete single docker container
+
+--> docker rm container name/container id
+
+to exit from container
+
+--> exit - whenever we use exit command docker container stops to overcome this we use ctrl+p+q( by using we can comeout from container without stopping it)
+
+--> without start container you cannot go inside
+
+to stop all running containers
+
+--> docker stop $(docker ps -a -q)
+
+to delete all containers
+
+--> docker rm $(docker ps -a -q)
+
+diff btw run and pull
+
+--> when we use docker run commands it automatically creates one container but when we use docker pull. container will not create
+
+to download only image without creating of container
+
+--> docker pull imagename
+
+to rename container
+
+--> docker rename oldcontainername newcontainername
+
+to check latest created single container
+
+--> docker container ls --latest
+
+to check latest created multiple containers
+
+--> docker container ls -n 1(any number)
+
+to get all running container ids
+
+--> docker container ls -a -q
+
+to get container ids
+
+--> docker container ls -q
+
+to check container source code 
+
+--> docker inspect container name
+
+to check application working without gng to browser
+
+--> curl publicipaddress:hostport ---> curl 171.11.2.3:8081
+
+to directly go to container after starting
+
+--> docker exec -it containername /bin/bash
+
+docker limitations while creating container(to provide memory and cpu for container)
+
+--> docker run -itd --name containername --memory=100m --cpus="0.25" -p 8081:80 imagename
+
+grep is used to search a word in file 
+
+--> docker inspect containername | grep -i cpu
+
+To create image from container
+
+---> docker commit containername imagename
+
+To build docker file/image
+
+---> docker build -t imagename directory
+
+To stop all running containers - this commands will stop all running contianers
+
+---> systemctl restart docker 
+
+To remove all containers those are stopped and here this command will delete only exited containers
+
+---> docker container prune
+
+to delete all images
+
+--> docker rmi $(docker images)
+
+Docker volume notes :
+
+when we create container automatically volume will be created
+
+volume is simply directory inside container
+
+first we have to declare directory volume and share the volume.
+
+if we stop container still we can access volume
+
+volume will not be included when you update image
+
+volumes can be used to replicate data in multiple containers - this replication works when you create containers with volume. existed containers which not having volumes will not be replicate data.
+
+
+volume and directory are same in docker but there is few differences
+
+1. from volume we can share the date to another volume
+2. we can directly delete the directory but we cannot delete the volume
+
+
+To create volume while creating container - command
+
+--> docker run -it --name containername -v /harsha imagename
+
+To share volume from one container to another container
+
+--> docker run -it --name containername --privileged=true --volume-from containername(old) imagename
+
+To move files from current working directory to volume in container - simply we can called as mounting the path to volume
+
+docker run -it --name contname -v /home/ec2-user:/volume1 --previleged=true imagename
+              
+                       or
+docker run -it --name containername -v ${pwd}:/volumename --privleged=true imagename
+
+
+/home/ec2-user - server path and /volume1 - we will create or else if we add this file existing module
+pwd means - present working directory
+
+to create volume without creating to container
+
+--> docker volume create volumename
+
+to get list of volumes -
+
+---> docker volume ls
+ 
+to remove volume - it works only when volume is not used in container
+
+--> docker volume rm volume name
+
+to remove all volumes -
+
+--> docker volume rm $(docker volume ls)
+
+to remove all unused volume
+
+--> docker volume prune
+
+to attach existing volume to container
+
+--> docker run -it --name containername -v previouslycreatedvolume:/newvolumenameincontainer imagename
+
+to see path of volumes
+
+--> docker volume inspect volumename
+
+Docker network -
+
+it is used to establish communication between two containers. this network will resolve the problem of ip address in between containers.
+
+it has concept of bridge - it will automatically allocate ip address to containers in sequential order.
+
+it has four types of netwrks
+
+Bridge network - its a default network means whatever the containers inside network they will communicate automatically - it will automatically assign when we create container
+Host network - if we want to give host ip address to container we will use this network
+None network - if we dont want to expose container - we will use this none network
+
+command to give host ipaddress to container
+
+--> docker run -it --name containername --network host imagename
+
+command to give none ipaddress to container
+
+--> docker run -it --name containername --network none imagename
+
+To create own network
+
+--> docker network create networkname
+
+to see list of network
+
+--> docker network ls
+
+to attach network to container while creating container
+
+--> docker run -it --name container --network networkname imagename
+
+to connect created network to already created container
+
+--> docker network connect networkname containername
+
+to disconnect network from container
+
+--> docker network disconnect networkname containername
+
+to check network connection
+
+--> ping ipaddressname
+
+to tag the image - this will be used when we upload image to docker hub - first we need to tag the image and will upload
+
+--> docker tag imagename dockerhubusername/repo-name
+
+to login to docker hub
+
+--> docker login
+
+to upload/push image to docker hub
+
+--> docker push dockerhubusername/repo-name
+
+to upload second version of same image we must use tag while tagging the image and also while  push the image 
+ 
+ while building image - docker build -t imagename currentdirectory
+ while tag image --> docker tag imagename suharsha03/reponame:tag(number/name)
+ while push the image --> docker push suharsha03/reponame:tag(number/name)
+
+
+Docker swarm :
+
+its an orchestration service and its used to manage and handle multiple containers at the same time
+
+--> its a group of servers that run docker application
+
+--> its used to manage containers on multiple severs
+
+--> Cluster means group of servers
+
+--> these activities of cluster managed by swarm manager.machines that have joined cluster is called swarm worker
+
+--> here it contains mainly manager and worker nodes
+
+--> usually for one server contains one manager node and multiple worker nodes
+
+--> Manager nodes are usually divide work among worker nodes(these are connected to manager node)
+
+---> each worker node will work on one individual service to get better performance
+
+docker swarm components :
+
+1. service - by using this service we will create containers and distribute them to worker nodes and manager nodes 
+           --> service will only get executed in manager node
+2. Task
+3. Manager
+4. Worker
+
+Note : locale will work only in manager node not in slave nodes. to resolve this we need to push this image to docker hub and will use it in service
+
+To initialize docker swarm
+
+--> docker swarm init --advertise-addr privateipaddressofcurrentserver
+
+then we will get one token and we will copy and paste that token in worker nodes 
+
+Here - Manager node will show as leader
+
+to check list of nodes
+
+--> docker node ls
+
+to create service and its replicas 
+
+--> docker service create --name servicename --replicas noofreplicas --publish 8083:80 imagename
+
+to check list of services 
+
+--> docker service ls
+
+to get list of which container running on which servers
+
+--> docker service ps servicename
+
+to remove service from all server
+
+--> docker service rm servicename
+
+to get list of containers in service
+
+--> docker service ps servicename
+
+to update existing image for existing-service
+
+--> docker service update --image imagename servicename
+
+to rollback to previous version of service and image
+
+--> docker service rollback servicename
+
+to check service logs
+
+--> docker service logs servicename
+
+to get code of service 
+
+--> docker service inspect servicename
+
+to scaling up services
+
+--> docker service scale servicename=totalofservicescount(including existing containers) 
+
+totalofservicescount we can define depends on if we want to increase/decrease we just mention number here
+
+to remove slave nodes 
+
+first we need to go worker node perform --> docker swarm leave
+
+then we need to remove from manager node --> docker node rm nodeid
+
+after removal of workernode we lose access and if we want to gain access we must need to get token(we will get this from managernode and paste them in workernodes) to add workernodes to manager
+
+--> docker swarm join-token worker/manager
+
+to reload daemon 
+
+--> systemctl daemon-reload
+
+Docker compose -
+
+docker compose - it used to create multiple containers in single server.
+
+its a tool used to build, run and ship the multiple containers of application
+
+its used yaml files to manage multiple containers as a single service
+
+compose files provides way of document and configure all the application dependencies (databases, volumes, networks, webservices, apis )
+
+docker-compose.yml --> docker compose file name
+
+to create containers using docker compose file
+
+--> docker-compose up -d
+
+to stop containers using docker compose file
+
+--> docker-compose stop
+
+to stop and remove containers using docker compose file
+
+--> docker-compose down
+
+to get images in compose file
+
+--> docker-compose images
+
+to get conatiners those are only created using docker compose 
+
+--> docker-compose ps
+
+to get conatiners logs those are only created using docker compose 
+
+--> docker-compose logs
+
+to pause conatiners in docker compose file(here pause means it will struck the containers if its in up/down state)
+
+--> docker-compose pause
+
+to unpause conatiners in docker compose file(here unpause means it will unpause the containers if its in down state)
+
+--> docker-compose unpause
+
+to get conatiners config/code in docker compose 
+
+--> docker-compose config
+
+to change filename and create containers of docker compose file name
+
+--> docker-compose -f harsha.yml up -id
+
+to change filename and down containers of docker compose file name
+
+--> docker-compose -f harsha.yml down
+
+docker stack - it is used to run multiple serverices on multiple server
+
+It is combination of docker swarm + docker compose
+
+---> to excute docker stalk first we initialize docker swarm and then write docker compose file
+
+to excute docker-compose file in stack - we need to use below commands
+
+---> docker stack deploy --compose-file docker-compose.yml stackfilename
+
+to increase replicas of the services - in docker stack
+
+--> docker service scale stackname_servicename=totalcount
+
+to get list of stacks
+
+--> docker stack ls
+
+to get list of containers in stacks
+
+--> docker stack ps
+
+to remove stack
+
+--> docker stack rm stackname
+
+to remove files in directory
+
+--> rm -rf *
+
+we can use docker GUI called portainer.io
+
+
+--> Load balancer - we use this to distribute the load to multiple servers
+
+--> Proxy - its a software/server that acts as a interface between client and server
+
+example : if user send a request to proxy. proxy will send request to server and server gives back output to proxy and then proxy will gives back request to client/user
+
+Two types of proxys :
+
+Forward Proxy - here when user makes a request to server first it will go to forward proxy then it will forward to destination server(here only one destination server will present) and then server will send back request to forward proxy then forward proxy will deliver back request to user.
+
+Note : IN forward proxy request will go to one and only destination server.
+
+
+reverse proxy - here when user makes a request to server first it will go to reverse proxy then it will forward request to one of destination serve(here muliplte destination servers will be present request will go to any one of the server) then server will send back output to reverse proxy then reverse proxy send back that request to user.
+
+
+Note : In reverse proxy request will go to any one of the server.
+
+command to see list of branches
+
+--> git branch -a
+
+To  link the container
+
+--> docker run --name containername -d -p 8081:80 --link linkincontainername:mysqlcon(here we need to provide connection name) imagename
+
+docker directory :
+
+here why we use means if instance volume is full how we can perform and store the date while doing any operations in that instance. to resolve we need to mount the volumes.
+
+first we need to go to instance then we will create ebs volume of 10gb then will attach to instance(ec2)
+
+after attaching we this volume work as a secondary volume and here i want to use this volume to store and perform specific task like docker ops
+
+to see list of block devices
+
+--> fdisk -l or lsblk
+
+frst we need to see list of volumes in instance perform above command
+
+we need to attach latest created volume to server(to act as primary volume) -- first we need to format disk
+
+--> fdisk /dev/xvdf ---> root device name( we used this while attaching volume in aws ebs)
+
+after it will ask to select primary or extended
+
+select primary
+
+and enter w to save.
+
+after mounting we need to use this volume to specific task like docker
+
+we need to edit one file - vi /etc/fstab/
+
+in that file we need to add docker path -- peform below command
+
+--> /dev/xvdf1 /var/lib/docker/ ext4 defaults 0 0 - save and exit
+
+then perform below command
+
+--> mkfs.ext4 /dev/xvdf1/
+
+--> mount -a
+
+here mounting is completed
+
+to see volumes with utilization
+
+--> df -h
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

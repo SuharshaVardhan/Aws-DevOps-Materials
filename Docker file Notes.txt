@@ -1,0 +1,134 @@
+Docker file
+
+components :
+
+FROM - it is used to define image
+LABEL - here we can mention author details
+RUN - it is used to execute the commands while we build the image from docker file 
+COPY - used to copy files from server to container
+ADD - used to copy files from server to container but it will also download the files and send to container
+EXPOSE - used to publish the port number
+WORKDIR - Used to create directory and directly go into the directory
+CMD - execute the commands while we run the image (when we are creating the container) and also if we have multiple cmd commands latest one will get executed.
+ENTRY POINT - execute the commands while we run the image and it has high priority and it overrides cmd and 
+ENV - which is used to assign variables but here we cannot override the values
+ARG - which is used to assign variables we can override this values
+
+difference between run and cmd commands
+
+run command we use when we build to image from docker file and it present in image 
+
+cmd command we use when we creating the container and it only present in container not in image so image size will be reduced
+
+to create volume in docker file
+
+FROM ubuntu
+VOLUME ["/volumename"]
+
+basic docker file -
+
+FROM ubuntu
+RUN apt update -y
+RUN apt install apache2 -y
+RUN echo "hi this is first docker file" > /var/www/html/index.html
+CMD ["usr/sbin/apachectl", "-D", "FOREGROUND"]
+
+basic docker compose file
+
+version: '3'
+service:
+  Paytm:
+     image: ngnix
+     ports: 
+       - "8081:80"
+
+ swiggy:
+    image: httpd
+    ports:
+      - "8082:80"
+
+docker-compose file using build
+
+version: '3'
+service:
+  Paytm:
+     image: ngnix
+     ports: 
+       - "8081:80"
+
+ swiggy:
+    build: ./directoryname/ -(present directory)
+    ports:
+      - "8082:80"
+
+build command is used to remove the manual intervention of building image - when you update the code it automatically build image and create container
+
+when we are writing docker compose file we must specify these 5 things
+
+1. Images
+2. Name
+3. Volume
+4. Networks
+5. ports
+
+simple docker compose using all above things
+
+version: "3"
+services:
+  Paytm:
+   image: ngnix
+   ports:
+       - "8081:80"
+   volumes:
+       - "myvolume"
+   networks:
+       - "mynetwork"
+
+networks:
+ mynetwork:
+    driver: bridge
+
+basic docker stack file to create services on multiple servers
+
+version: "3"
+services: 
+  myapp:
+    image: ubuntu
+    ports: 
+      - "8099:80"
+    deploy:
+      mode: replicated
+      replicas: 3
+    volumes:
+     - "myvolume"
+
+
+basic docker-compose file using loadbalancer using reverse proxy
+
+version: "3"
+services:
+  amazon:
+    Build: ./amazon/
+    ports:
+      - "8081:80"
+    
+  flipkart:
+    build: ./flipkart/
+    ports:
+      - "8082:80"
+
+  nginx:
+   build: ./nginx/
+   ports:
+     - "5000:80"
+   depends_on:
+     - amazon
+     - flipkart
+
+Here nginx will be load balancer it will manager load of application requests
+
+Here for load balancer we need to write configuration file
+
+
+
+
