@@ -1,0 +1,11 @@
+RCCM - it is found in 2005 - to track only one file
+
+RCS - to track multiple file but not directories
+
+CVS - to track multiple files and mutliple directories but single user
+
+svn  - to track multiple files and mutliple directories and multiple users but not versions
+
+GIT - to track multiple files and mutliple directories and multiple users and multiple versions thats why its called as Disturbed version control system. or scoruce code control system
+
+GIT tracks changes you made and record what has been in file. allowing changes by multiple people that all merged to one source.
