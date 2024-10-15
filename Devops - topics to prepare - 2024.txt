@@ -1,0 +1,30 @@
+Devops - 2024 - Intermediate
+
+1. SDLC - what and why
+2. Linux - 
+How to create linux machine
+Learn Shell and Linux commands
+3. Virtualization - How
+4. Shell Scripting - Learn
+5. GIT - VCS, Git commands
+6. CI/CD - jenkins or git hub actions skip CD coz Cd is advance operations and use maven
+7. configuration management - Ansible (commands and playbooks)
+8. Infrastructure automation - Terraform (scripts to create an ec2 instance)
+9. Docker - Containeraization( how to build, comparision)
+10. Kubernetes - CI/CD
+
+
+Advanced concepts 
+
+CI/Cd
+shell scripting
+monitoring
+K8s
+
+cloud platform
+
+- Aws and azure
+
+--> terraform advanced
+
+--> Python - APi, serverless concepts.
