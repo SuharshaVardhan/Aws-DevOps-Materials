@@ -1,0 +1,270 @@
+Cloud : its a cloud computing service that refers to cloud they used to access servers over the internet. they include data base also and they setup in data centers across the world. it is used to store data and access data from any where
+
+2 types of cloud : service model and deployment model
+
+difference between server and vm 
+
+vm - it will install and take resources from local system to create resources
+server - it will not take resources from local and it directly creates resources 
+
+steps to create ec2 instance - 
+name
+ami image
+instance type
+key pair
+sc(it includes vpc)
+volume size
+review and launch
+
+SAAS - they will build and provide the tool and all the things . user just needs to use that.
+       (SaaS is like renting a house: the landlord maintains the house, but the tenant mostly gets to use it as if they owned it.)
+
+PAAS - they will provide the server with their own equipment. user needs to use that and build their own application
+       (PaaS vendors offer everything necessary for building an application, including development tools, infrastructure, and operating systems, over the Internet. PaaS can be compared to renting all the tools and equipment necessary for building a house, instead of renting the house itself. )
+
+IAAS - they will provide the server and users needs to get their tools used to build application. here user can host their application in their serves
+       (IaaS is like a company leasing a plot of land on which they can build whatever they want — but they need to provide their own building equipment and materials.)
+
+S3 -
+
+Bucket Creation/deletion normally and using aws cli
+Uploading files
+versioning files
+make them publicly accessible
+website hosting
+cross-region replication
+integration with Jenkins - for war files storing
+creating and modifying s3 buckets using terraform
+
+s3 bucket by using terraform
+
+provider "aws" {
+region = "ap-south-1"
+}
+
+resource "aws_s3_bucket" "first" {
+bucket = "Harshafirstbucket"
+}
+
+#now we will enable versioning for above bucket
+
+#for versioning we need to create separate resource
+
+resource "aws_s3_bucket_versioning" "second" {
+
+#here we need to connect this versioning resource to the bucket we created
+
+bucket = "aws_s3_bucket.first.id"
+versioning_configuration {
+status = "Enabled"
+}
+}
+
+#Now we will enable acl for above bucket
+
+#for that also we need to create separate resource for acls activation and ownerships
+
+#first creating ownersip for bucket for enabling acl
+
+resource "aws_s3_bucket_ownership" "three" {
+
+#here also we need to connect this acl resource to the bucket we created first
+
+bucket = "aws_s3_bucket.first.id"
+
+# here we need to create rule for enable ownership
+
+rule {
+
+object_ownership = "BucketOwnershipPreferred"
+
+}
+}
+
+#second enabling acl need to create new resource
+
+resource "aws_s3_bucket_acl" "four" {
+
+#here we need to use below syntax for enabling acl and connecting above ownership resource
+
+depends_on = [aws_s3_bucket_ownership.three.id]
+
+bucket = "aws_s3_bucket.first.id"
+acl = "Enabled"
+}
+
+
+VPC -
+
+subnet are ntg but small networks in vpc
+
+components - below all componets will be in inside vpc - vpc is ntg but private cloud which is present in public cloud. it has more security, privacy and we can easily get back data and manage our resource inside.
+
+1.subnets(public and private)
+2.routable - these are used to communicate between components inside vpc(how the traffic route between components)
+3.internet gate way - used to establish connection with public subnet only
+4.NAT gateway - by using this only we can forward any request from public subnet to private subnet (public subnet will be frontend log in page and private subnet will be inside environment like app) and it will only present in public subnet only
+5.IP address - This will be created when we create vpc
+
+
+
+VPC explanation: with example
+
+
+
+Create VPC(when vpc created automatically routable will be created)
+Create IGW and attach VPC
+Create subnet and attach VPC
+routable(click on edit routes and add route and connect IGW)
+
+when you create multiple vpcs(with diff networks) if you want to establish connection them use peering connection. How ?
+
+Go to peering connection and give source and destination vpcs.
+
+1. after establishing peering connection it wont connect without routetable connection 
+
+to establish this peering connection between vpc-1 and vpc-2. we need to connect their routable - how ?
+
+--->select routes of vpc-1 and go to routes and click on actions, click on edit routes and add route and give vpc-2 cidr range here and select peering connection and select connection id(PE) 
+
+----> select routes of vpc-2 and go to routes and click on actions, click on edit routes and add route and give vpc-1 cidr range here and select peering connection and select connection id(PE)
+
+To avoid connection establish issues and select all traffic in SG'S when creating ec2 instance(both)
+
+
+Terraform code creating vpc
+
+provider "aws" {
+region = "us-east-1"
+}
+
+
+Resource “aws_vpc” “abc” {
+cidr_block = “10.0.0.0/16”
+instance_tenancy = “default”
+enable_dns_hostnames = “true”
+Tags = {
+Name = “my-vpc”
+}
+}
+
+Resource “aws_subnet” “mysubnet” {
+vpc_id = aws_vpc.abc.id
+cidr_block = “10.0.0.0/16”
+availability_zone = “ap-south-1a”
+Tags = {
+Name = “subnet-1”
+}
+}
+
+Resource “aws_internet_gateway” “igw” {
+vpc_id = aws_vpc.abc.id
+Tags = {
+Name = “my-igw”
+}
+}
+
+Resource “aws_route_table” “myrt” {
+vpc_id = aws_vpc.abc.id
+Route {
+cidr_block = “0.0.0.0/0”
+gateway_id = aws_internet_gateway.igw.id
+}
+Tags = {
+Name = “my-route-table”
+}
+}
+
+EBS :
+
+3 types of storage level
+
+1. object level we used in s3
+2. File level
+3. Volume level we used in ebs
+
+This is used to increase volume for your server in multiple ways
+
+1. for already exisiting server - select server and go to storage section and select storage id and it will open and click on action and modify volume we can do this only one time
+2. for already exisiting server and completion of step-1. we need to create separate storage volume and attach to existing server - click on newly created volume and attach volume and select our instance and give device name as /dev/xvdf(must use this) and same way we can detach volume
+
+we can use this like when we need this current server files to new server. for that we need to create current server storage snapshot and we can attach this snapshot to new server how means when we launch new server at ebs storage and we need to add our snapshot image there. so that we can get all our existing setup to new user.
+
+after doing above step - we can two volumes in storage - 1. default 2. shared(old setup)
+
+requirement is we need to have single default storage how we do means - 
+
+1. will stop newly created server
+2. go to storage and detach both default and shared volume (must give default storage volume device name as /dev/xvda/)
+3. re-attach shared volume as default volume - how we attach volume to server and restart server.
+
+EBS creation through terraform.
+
+provider "aws" {
+region = "us-east-1"
+}
+
+
+resource “aws_ebs_volume” “abc” {
+tags = {
+Name = “new-volume”
+}
+size = 13(must be higher than 10)
+availability_zone = "us-east-1"
+}
+
+EBS attaching to server
+
+provider "aws" {
+region = "us-east-1"
+}
+
+resource "aws_instance" "one" {
+tags = {
+Name = "my-instance"
+}
+ami = "ami-1232ff3f34"
+instance_type = "t2.micro"
+volume_id = aws_ebs_volume.one.id
+}
+
+
+
+resource “aws_ebs_volume” “abc” {
+tags = {
+Name = “new-volume”
+}
+size = 13(must be higher than 10)
+availability_zone = "us-east-1"
+}
+
+Load balancer :
+
+Load balancer : it is used to distributes requests across the multiple servers (based on health state of the server).
+
+Auto scaling ---> by using auto scaling we can scale-up/scale-down server depends upon demand.
+
+--> autoscaling group ----> By using Launch configuration template we can scale up and scale down servers.
+
+4 types of load balancer :
+
+1. application load balancer
+2. network load balancer
+3. classic load balancer
+4. gateway load balacer
+
+
+for putting webpage in server - var/www/html/ and create index.html
+
+for linux - tomcat server and for frontend webpages - nginix, apache, httpd.
+
+for windows - IIS
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,48 @@
+Aws CLI
+
+Launching ec2 instance using CLP
+
+---> Launch one instance in EC2
+
+-> We need to launch multiple instances using CLP
+-> we can use CLp means for that
+-> First we have to launch one ec2 launch using keypair in aws console
+-> then we can download any one terminal from internet that can be saved in locale machine like putty, mobaxterm, No machine
+-> copy public ip address and open terminal we need to connect this instance to terminal
+-> command - ssh ubuntu/linux@publicipaddress
+
+-> it will ask yes/no then select yes and it will say permissiondenied
+
+-> we need to connect using keyvalue pair(this is already created in while creating instance in ec2 this can be saved in local machine)
+
+-> command to using keyvaule pair(it will save as .pem file) - ssh -i /users/desktop/documents/filename ubuntu@publicipadrress(mention your saved path) and then also it will say denied because its a sceret file and we need to change permissions of .pem file
+
+-> to change the permissions of file command - chmod 600 /users/desktop/document/test.pem and it will change permissions of file then enter
+-> command to connect with CLI with ec2 instance - ssh -i /users/desktop/documents/filename ubuntu@publicipadrress
+
+Aws CLI - download aws cli search in internet and download for windows and keep it in path
+
+to check aws installed or not in your terminal - aws version
+
+after aws installionation in terminal to connect with our account - we need to create access key in security crenditials in aws console at account info
+
+then we need to configure in terminal - provide credentials by using command - aws configure
+
+it will ask key id - key id and secret key and check region then authenticate done 
+
+to get S3 buckets - its used to store files in aws and then can we can use in instances - we can see s3 by using command - "aws s3 ls"
+
+to create s3 bucket by using command - aws s3 mb file name
+
+then we need to create ec2 instance - go to aws document copy command and provide all instance info and ec2 instance will be created by using CLI
+
+To create instance using Aws CFT - search CFT and create stack and create a template or else if u have existing template u can select(you can get it from git repostiry - awscloudformation)  
+
+To create instance using Aws API - we need to write script to create instance by shell script and python(boto3)
+
+
+
+
+
+
+
