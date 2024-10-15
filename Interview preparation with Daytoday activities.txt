@@ -1,0 +1,32 @@
+How to prepare for devops interview :
+
+1. Understanding of corporate project model
+2. Core concepts - like Build the application - package the application to generate artifact and have to know full concept of one tool
+3. Hands on experience on single good project
+4. CI/CD pipeline
+5. IAC - infrastructure as CODE - build and deploy project by using IAC(scripting) - two main tools for IAC is Terraform(best for provising) and Ansible(best for configuration management.
+6. Troubleshooting/ debugging - if pipeline fails at any stage and how do you do that'
+7. security 
+8. behavioral questions(scenario based questions)
+9. Common interview questions - reading and understanding
+10. Communication is very important. - confidence matters.
+
+
+
+Day to day activities: tehnically
+
+1. We need to verify mails and check issues or else new tasks like enchancement.
+
+-> POD management in Kubernetes cluster
+-> Modification of old pipeline to test any new feature or tool
+-> DSTUM and OPS meeting means daily stand ups and weekly stand ups 
+-> REPO Management means - here two types of tasks you can do
+1. Old project - removing stale branches, checking if any pull requests are pending and mentioning correct code commits and updating jenkin files and config files
+2. New project - create repo, create branches, create user group for diff kind of permissions, create groups for relevant projects
+->Troubleshooting - means if client facing issues with any tool they raise the ticket based on priority of task we have to do work - 3types of tickets
+incident, support, task
+-> POC - any new tool integration for project before we need to explore it and learn about the tool and have to give demo for others and prepare document for it Example - GitLab and sonar integration
+->IAC - by using if client purchases any new VMs we need to install tools to their VMs so we cannot go each vms and install tools right so that we can use IAC. 
+by using IAC(terraform and ansbible) - we need to provisioning the VMs and install tools in Vms
+-> monitoring by using some tools like Grafana - we need to monitor Jenkins tool and GitLab etc. assume like if 400 members are using these we can do analysis like when Jenkins was used and last job creation in Jenkins and have to prepare for it'
+-> I used to help my junior team members to fix their issues.
