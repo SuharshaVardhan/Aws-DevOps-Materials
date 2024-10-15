@@ -1,0 +1,188 @@
+Kubernetes :
+
+it is also an orchestration platform
+
+--> it is used to mainly convert manual process of managing, deploying, and scaling containierised applications.
+
+--> it is developed using go language
+
+--> Here Containers are used in easy way to bundle and run applications. In prod environment u need to manage containers very carefully because of downtime here by using K8s we can scale up the servers. In docker we used docker swarm for scaling up the containers not servers but in k8s we can scale-up servers too.
+
+Kubernetes architecture :
+
+Kubernetes Master, Kubernetes nodes.
+
+Kubernetes Master components :
+
+user - who manages the Kubernetes
+
+kubectl - it is command line interface for k8s - here only we can run commands
+
+api server - it will take request from user and will store the request in etcd
+
+etcd - it act as database for k8s in key-value format.
+
+scheduler - it is used to take and verify tasks in etcd database and also it has whole info k8s nodes like health etc. It will decide the where the pod will create in which node. 
+
+control manager - it will help the scheduler to create pod in which node. becoz scheduler will do scheduling and control manager execute the task which is schedule by scheduler.
+
+Kubernetes nodes :
+
+kubelet : it ensures that pod is running or not.
+
+kubeproxy : it is used to maintain network connection between the nodes.
+
+POD : it contains A group of one or more containers
+
+cadvisor - it is used to monitoring the containers
+
+container : it is virtual machine which doesnot have any OS and is used to run the application in worker nodes
+
+cluster : it is group of servers
+--> every cluster contains one master and many worker nodes
+--> it contains both master and worker nodes
+--> here master will assign the tasks and worker nodes excutes the task 
+
+K8s cluster setup :
+
+--> self managed clusters - these are managed by us
+
+1. minikube - it is a single node cluster
+2. kubeadm - it is multinode cluster(it will only create servers in cluster)
+3. KOPS(Kubernetes operations) - its a multinode cluster it will create entire infrastructure and along with servers
+
+k8s - default path - /usr/local/bin/
+
+
+Kubernetes setup we no need to remember - we can install using scripts
+
+its prefer ubuntu machine
+
+1. Update server using 
+
+--> apt update -y
+
+--> apt upgrade -y
+
+2. install docker 
+3. Instal minikube
+4. install kubectl
+
+1. to restart docker
+
+--> minikube start --driver=docker --force
+
+to check status of minikube
+
+--> minikube status
+
+kubectl - its a clI with this only we can interact with k8s cluster.
+
+--> using this we can create, manage, delet pods, deployments and other resources.
+
+--> we can do monitoring, trouble-shooting, scaling and update the pods.
+
+directory for kubectl - $home/.kube
+
+syntax :
+
+kubectl [command] [type] [name] [flags]
+kubectl api-resources : to list all upi resources
+
+POD :
+--> it is smallest unit of deployments
+--> a group of containers
+--> pods are ephemeral(short living objects)
+--> we use mostly single container in pods
+--> while creating we must specify image, along with necessary config and resource limits.
+--> k8s cannot communicate with containers. it communicate with only pods.
+--> when we create pod, inside containers can share same namespace, volumes and networks.
+--> pods can be created two types
+1. imperative(using commands)
+2. declarative(using manifest file)
+
+imperative way -
+
+command for creating pod
+
+--> kubectl run podname --image=imagename
+
+command for checking of pods
+
+--> kubectl get pod/pods/po
+
+command for delete po
+
+--> kubectl delete pods
+
+declarative method - using manifest file
+
+basic manifest file
+
+apiVersion: v1 -> default
+kind: Pod --> here we need to mention which resource we are creating. we must use capital P in pod
+metadata:         
+  name: flm-pod  --> to represent pod info
+spec:
+  container:
+   - name: containername --> containername
+   image: nginx --> image name
+   ports: 
+    - containerPort: 8081 --> we use only host port
+
+after writing above file execute below command to create pod using manifest file
+
+--> kubectl apply -f podfilename.yml
+
+command to get pods full info
+
+--> kubectl get pod -o wide
+
+KOPS architecture - this will work according to 
+
+1. first we need to setup one server for KOPS - by using this server we will create cluster. cluster includes group of servers(either master and worker nodes). and whatever the commands we perform will perform in KOPS server only
+
+2. From KOPS we will create cluster means master and worker nodes
+
+3. aLL operations will done through KOPS server.
+
+4. if we perform one task using command in KOPS server means first request will go to master and master will assign to worker nodes
+
+5. task execution will be done in worker nodes. master is responsible for assign tasks to worker nodes. master will take inputs from KOPS server.
+
+commands to get cluster info
+
+--> KOPS get cluster
+
+command to edit cluster 
+
+--> KOPS edit cluster clsutername
+
+command to edit worker node info
+
+--> KOPS edit ig --name=clustername workernodename
+
+command to edit master node info
+
+--> KOPS edit ig --name=clustername masternodename
+
+command to configure/up/create cluster
+
+--> KOPS update cluster --name clustername --yes --admin
+
+note : pods will never gets created in master. pods will create in worker nodes
+
+command to delete all pods
+
+--> kubectl delete pod --all
+
+
+
+
+
+
+
+
+
+
+

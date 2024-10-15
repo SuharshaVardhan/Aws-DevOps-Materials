@@ -1,0 +1,333 @@
+Replication controller :
+
+--> it specifies the number of pods that are running as per requirement.
+
+--> it will manage the pod life cycle
+
+--> it has self healing capabilities - means if one pod gets deleted automatically one pod will create with same configurations
+
+--> as per requirement it will terminate or add pods in nodes
+
+--> it specifies the pods with label to identify
+
+--> we need to specify desired no of replicas for pods in yaml file
+
+rc.yml file :
+
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: my-new-rc
+spec:
+replicas: 2
+selector:
+ app: swiggy
+template:
+ metadata:
+  labels:
+   app: swiggy
+
+spec:
+container:
+- name: cont-1
+  image: nginx
+  ports:
+ - containerPort: 80
+
+commands to create pod using replicationcontroller
+
+--> kubectl apply -f rc.yml
+
+command to show rcs
+
+--> kubectl get rc
+
+command to full info about rc
+
+--> kubectl describe rc rcname
+
+command to increase replicas in runtime(without open to file)
+
+--> kubectl scale rc rcname --replicas totalcount
+
+command to delete rc including pods
+
+--> kubectl delete rc rcname
+
+command to delete only rc excluding pods
+
+--> kubectl delete rc rcname --cascade=orphan
+
+here we deleted only rc excluding pods. after deleting rc, pods will not have self-healing capability.
+
+Replica set:
+
+--> it is same as replica controller but it will resolve draw backs of rc
+
+--> in rc we cannot create multiple selector and server. 
+
+--> all functionalities of rc will be present here along with more advanced functionalities
+
+--> diff between rc and rs is selectors.
+
+--> key diff between rc and rs is in rc we can only select equality based selector(means only one) and but in rs we can select set-based selector(multiple)
+
+--> it also provide better scaling than rc
+
+--> a replicaset identifies new pod by using selector(means labels)
+
+--> we can give multiple values to same key
+
+rs.yml
+
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+ name: my-new-rs
+ labels:
+ app: swiggy
+spec:
+replicas: 2
+selector:
+matchLabels:
+ app: swiggy
+template:
+ metadata: 
+  labels:
+   app: swiggy
+spec:
+ containers: 
+ - name: cont1
+  image: nginx
+  ports:
+- containerPort: 80
+
+Kubernetes services :
+
+1. Cluster IP - it will provide stable ip address and DNS name for pod with in cluster and here we cannot expose the pod outside
+2. Load balancer - it will balance the load of application. when high traffic occurs and it will route the traffic to other nodes.
+3. Node port - by using this we can access the application externally and internally
+
+--> it is method of exposing pods in cluster.
+
+--> we can access the pod using only node port. each pod get its own ip address
+
+--> if we want to access the pod from inside. we use cluster IP
+
+--> if the service type is load balancer and node port we can access the pod outside the cluster.
+--> it enables the pod from network topology. it makes easier to scale and manage applicatjons.
+
+compoents of services :
+
+imp Properties: these we can use while writing manifest file.
+
+--> selector : this we can use when we want to label the pod to create replicas and enable self healing capability.
+
+--> port : the port is number which the service will allow for incoming traffic (host port)
+
+--> target port : this port is also a number which the pod allow the traffic ( container port)
+
+--> type : the type of the service such as load balancer, cluster ip, node port, or external name.
+
+whenever we creating pods using service.
+
+--> first we need to create manifest file(here we need to mention label)
+--> then we need to create service for above manifest file (here we need provide selector) for exposing either internally or externally.
+
+pod.yml
+
+apiVersion: v1
+kind: pod
+metadta:
+name: my-pod
+labels:
+app: swiggy
+
+spec:
+containers:
+-name: my-cont
+image: nginx
+ports:
+- ContainerPort: 80
+
+Clusteripservice.yml
+
+apiVersion: v1
+kind: service
+metadata:
+name: my-service
+
+spec:
+type: ClusterIP
+selector:
+ app: swiggy
+ports:
+ -port: 80
+ targetport:80
+
+--> after writing both files we need to up the command for clusterIP.yml to create service and apply command for pod.yml to create pod
+
+command for create service
+
+--> kubectl apply -f servicefilename.yml
+
+command for service details
+
+--> kubectl get svc -o wide
+
+command to delete service
+
+--> kubectl delete svc servicename
+
+NodePort service:
+
+this can be used we need to access application externally and internally
+
+here node port range -> 30001 to 32797
+
+pod.yml
+
+apiVersion: v1
+kind: pod
+metadta:
+name: my-pod
+labels:
+app: swiggy
+
+spec:
+containers:
+-name: my-cont
+image: nginx
+ports:
+- ContainerPort: 80
+
+NodePort.yml
+
+apiVersion: v1
+kind: service
+metadata:
+name: my-service
+
+spec:
+type: NodePort
+selector:
+ app: swiggy
+ports:
+ -port: 80
+ targetport:80
+ nodePort: 30001
+
+LoadBalancer service:
+
+this can be used we need to access application externally and internally and also it will create loadbalancer for our application to manage to load.
+
+pod.yml
+
+apiVersion: v1
+kind: pod
+metadta:
+name: my-pod
+labels:
+app: swiggy
+
+spec:
+containers:
+-name: my-cont
+image: nginx
+ports:
+- ContainerPort: 80
+
+LoadBalancer.yml
+
+apiVersion: v1
+kind: service
+metadata:
+name: my-service
+
+spec:
+type: LoadBalancer
+selector:
+ app: swiggy
+ports:
+ -port: 80
+ targetport:80
+
+Namespace:
+
+--> this namespace we can use to create cluster within cluster. why means if we have multiple environments like frontend and backend. by using namespace concept we can separate them each in isolate the environments.
+
+--> Namespaces are used to group the components like pods, services and deployments.
+--> This can be useful for separating environments like staging, dev and testing and prod.
+--> In realtime frontend pods are mapped to one namespace and backend pods are mapped to another namespace.
+--> we can have multiple namespaces with in one cluster. they are logically isolated from another.
+--> we can use this mainly to logical separation for teams, projects and applications.
+--> within namespace can communicate to other namespace. by default it wont but we can provide communicate.
+--> namespace must be unique
+--> when you delete a namespace all the resources will be deleted.
+
+types of namespaces :
+
+default - when we create pods, services and deployments all these must be saved in default namespace. if we dont provide while creating pod. if we provide it will store according to namespace that we provide.
+
+Kube-public - This namespace for resources that are publicly available for all.
+
+kube-system - this namespace for objects created by Kubernetes system. for example it will create automatically when we create services.
+
+kube-node-lease - here we can lease the objects associated with eachnode that improves performance of the node and cluster automatically scales.
+
+by above all Kubernetes given namespace but we can create our own namespaces
+
+command to create namespace:
+
+--> kubectl create ns namespace-name
+
+command to attach namespace while creating pod
+
+--> kubectl run pod-1 -n namespacename --image=nginx
+
+command to see pod which is created in namespace
+
+--> kubectl get pod --namespace=namespacename
+
+command to get objects which are associated with namespace
+
+--> kubcectl get all --namespace=namespacename
+
+command to delete namespace
+
+--> kubectl delete ns namespacename
+
+creating pod using namespace in manifest file
+
+apiVersion: v1
+kind: pod
+metadta:
+name: my-pod
+namespace: namespacename
+labels:
+app: swiggy
+
+spec:
+containers:
+-name: my-cont
+image: nginx
+ports:
+- ContainerPort: 80
+
+interview question:
+
+diff between stateless application and statefull application
+
+--> stateless app means server will not store pod info if pod gets deleted here replica of pod will gets created in any other server.
+
+--> statefull app means server will store pod info and if pod gets deleted another replica of pod will be created in same server
+
+
+
+
+
+
+
+
+
+
